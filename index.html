@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NAMB - Majice s dizajnom</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    header { background: #111; color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    nav a { margin: 0 10px; color: #fff; text-decoration: none; }
+    .lang-switch { cursor: pointer; color: #0ff; }
+    .products { display: flex; flex-wrap: wrap; padding: 1rem; gap: 1rem; }
+    .product { border: 1px solid #ccc; padding: 1rem; width: 200px; }
+    .cart { position: fixed; bottom: 1rem; right: 1rem; background: #fff; border: 1px solid #000; padding: 1rem; }
+    button { padding: 0.5rem 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>NAMB</strong></div>
+    <nav>
+      <a href="#home" data-key="home">Početna</a>
+      <a href="#shop" data-key="shop">Trgovina</a>
+      <span class="lang-switch" onclick="toggleLang()">EN</span>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home">
+      <h1 data-key="welcome">Dobrodošli u NAMB – unikatne majice s dizajnom</h1>
+      <p data-key="desc">Otkrij našu kolekciju majica koje nose poruku i stil.</p>
+    </section>
+
+    <section id="shop">
+      <h2 data-key="shopTitle">Naši proizvodi</h2>
+      <div class="products" id="productList"></div>
+    </section>
+  </main>
+
+  <div class="cart" id="cart">
+    <h3 data-key="cart">Košarica</h3>
+    <ul id="cartItems"></ul>
+    <p data-key="total">Ukupno: <span id="totalPrice">0 €</span></p>
+    <a href="https://www.paypal.com" target="_blank"><button data-key="checkout">Plaćanje</button></a>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name_hr: "Crna majica NAMB", name_en: "NAMB Black T-Shirt", price: 20 },
+      { id: 2, name_hr: "Bijela majica NAMB", name_en: "NAMB White T-Shirt", price: 22 }
+    ];
+
+    const cart = [];
+    const productList = document.getElementById("productList");
+    const cartItems = document.getElementById("cartItems");
+    const totalPrice = document.getElementById("totalPrice");
+
+    let currentLang = 'hr';
+
+    function renderProducts() {
+      productList.innerHTML = '';
+      products.forEach(prod => {
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <h4>${currentLang === 'hr' ? prod.name_hr : prod.name_en}</h4>
+          <p>${prod.price} €</p>
+          <button onclick="addToCart(${prod.id})">${currentLang === 'hr' ? 'Dodaj u košaricu' : 'Add to cart'}</button>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    function addToCart(id) {
+      const item = products.find(p => p.id === id);
+      cart.push(item);
+      renderCart();
+    }
+
+    function renderCart() {
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = (currentLang === 'hr' ? item.name_hr : item.name_en) + ` - ${item.price} €`;
+        cartItems.appendChild(li);
+        total += item.price;
+      });
+      totalPrice.textContent = total + ' €';
+    }
+
+    const translations = {
+      hr: {
+        home: "Početna",
+        shop: "Trgovina",
+        welcome: "Dobrodošli u NAMB – unikatne majice s dizajnom",
+        desc: "Otkrij našu kolekciju majica koje nose poruku i stil.",
+        shopTitle: "Naši proizvodi",
+        cart: "Košarica",
+        total: "Ukupno:",
+        checkout: "Plaćanje"
+      },
+      en: {
+        home: "Home",
+        shop: "Shop",
+        welcome: "Welcome to NAMB – Unique T-Shirts with Style",
+        desc: "Explore our collection of message-driven, stylish t-shirts.",
+        shopTitle: "Our Products",
+        cart: "Cart",
+        total: "Total:",
+        checkout: "Checkout"
+      }
+    };
+
+    function toggleLang() {
+      currentLang = currentLang === 'hr' ? 'en' : 'hr';
+      document.querySelector('.lang-switch').textContent = currentLang === 'hr' ? 'EN' : 'HR';
+      Object.keys(translations[currentLang]).forEach(key => {
+        const el = document.querySelector(`[data-key="${key}"]`);
+        if (el) el.textContent = translations[currentLang][key];
+      });
+      renderProducts();
+      renderCart();
+    }
+
+    // Init
+    renderProducts();
+  </script>
+</body>
+</html>
